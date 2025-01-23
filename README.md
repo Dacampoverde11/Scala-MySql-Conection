@@ -147,62 +147,207 @@ import cats.effect.IO
 import doobie._
 import doobie.implicits._
 
-object MySQLConnection {
-  val xa = Transactor.fromDriverManager[IO](
-    "com.mysql.cj.jdbc.Driver",   // Driver MySQL
-    "jdbc:mysql://localhost:3306/scala_db", // URL de la base de datos
-    "root",                       // Usuario
-    "password"                    // Contraseña
-  )
-
-  def getAllUsers: IO[List[(Int, String, String)]] = {
-    sql"SELECT id, name, email FROM users"
-      .query[(Int, String, String)]
-      .to[List]
-      .transact(xa)
+  object MySQLConnection {
+    val xa = Transactor.fromDriverManager[IO](
+      "com.mysql.cj.jdbc.Driver", // Driver MySQL
+      "jdbc:mysql://localhost:3306/music_library", // URL de la base de datos
+      "root", // Usuario
+      "Dacampoverde11" // Contraseña
+    )
   }
 
-  def main(args: Array[String]): Unit = {
-    val users = getAllUsers.unsafeRunSync()
-    users.foreach(println)
+```
+
+**Ejemplo Consultas Doobie**
+```scala
+import cats.effect.{IO, IOApp}
+import doobie._
+import doobie.implicits._
+
+object Exploracion1 extends IOApp.Simple {
+
+  // Configuración del transactor para conectarse a la base de datos
+  object MySQLConnection {
+    val xa = Transactor.fromDriverManager[IO](
+      "com.mysql.cj.jdbc.Driver", // Driver MySQL
+      "jdbc:mysql://localhost:3306/music_library", // URL de la base de datos
+      "root", // Usuario
+      "Dacampoverde11" // Contraseña
+    )
+  }
+
+  // Consulta para obtener todas las canciones de la tabla `songs`
+  def getAllSongs: IO[List[(Int, String, String, String, String)]] = {
+    sql"SELECT id, title, artist, album, duration FROM songs"
+      .query[(Int, String, String, String, String)] // Definimos el tipo esperado para el resultado
+      .to[List]
+      .transact(MySQLConnection.xa)
+  }
+
+  // Consulta para obtener canciones con duración mayor a 5 minutos
+  def getSongsLongerThanFiveMinutes: IO[List[(Int, String, String, String, String)]] = {
+    sql"SELECT id, title, artist, album, duration FROM songs WHERE duration > '00:05:00'"
+      .query[(Int, String, String, String, String)] // Tipo esperado del resultado
+      .to[List]
+      .transact(MySQLConnection.xa)
+  }
+
+  // Método principal
+  def run: IO[Unit] = {
+    for {
+      // Obtener y mostrar todas las canciones
+      allSongs <- getAllSongs
+      _ <- IO {
+        println("Todas las canciones:")
+        println(f"${"ID"}%-5s ${"Título"}%-40s ${"Artista"}%-30s ${"Álbum"}%-30s ${"Duración"}")
+        println("-" * 110)
+        allSongs.foreach { case (id, title, artist, album, duration) =>
+          println(f"$id%-5d $title%-40s $artist%-30s $album%-30s $duration")
+        }
+        println()
+      }
+
+      // Obtener y mostrar canciones con duración mayor a 5 minutos
+      longSongs <- getSongsLongerThanFiveMinutes
+      _ <- IO {
+        println("Canciones con duración mayor a 5 minutos:")
+        println(f"${"ID"}%-5s ${"Título"}%-40s ${"Artista"}%-30s ${"Álbum"}%-30s ${"Duración"}")
+        println("-" * 110)
+        longSongs.foreach { case (id, title, artist, album, duration) =>
+          println(f"$id%-5d $title%-40s $artist%-30s $album%-30s $duration")
+        }
+      }
+    } yield ()
   }
 }
 
+
+
 ```
+![image](https://github.com/user-attachments/assets/04abfe67-5bf5-403e-a90c-5bd5c2f1b5ab)
+
+![image](https://github.com/user-attachments/assets/b1bbc200-8316-4879-a5f5-12d561f93c6f)
+
+
 
 #### **Establecer conexión con Slick**
 
 ```scala
 import slick.jdbc.MySQLProfile.api._
-
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 import scala.concurrent.Await
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration._
 
-object SlickExample {
+object Exploracion2 {
+
+  // Configuración del DB y conexión a la base de datos
   val db = Database.forURL(
-    "jdbc:mysql://localhost:3306/scala_db",
-    user = "root",
-    password = "password",
-    driver = "com.mysql.cj.jdbc.Driver"
+    "jdbc:mysql://localhost:3306/music_library", // URL de la base de datos
+    driver = "com.mysql.cj.jdbc.Driver",
+    user = "root", // Usuario
+    password = "Dacampoverde11", // Contraseña
+    keepAliveConnection = true
   )
 
-  class Users(tag: Tag) extends Table[(Int, String, String)](tag, "users") {
-    def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
-    def name = column[String]("name")
-    def email = column[String]("email")
-    def * = (id, name, email)
+  // Definición del modelo `Song`
+  case class Song(id: Int, title: String, artist: String, album: String, duration: String)
+
+  // Definir la tabla `songs`
+  class Songs(tag: Tag) extends Table[Song](tag, "songs") {
+    def id = column[Int]("id", O.PrimaryKey)
+    def title = column[String]("title")
+    def artist = column[String]("artist")
+    def album = column[String]("album")
+    def duration = column[String]("duration")
+
+    def * = (id, title, artist, album, duration) <> (Song.tupled, Song.unapply)
   }
-
-  val users = TableQuery[Users]
-
-  def main(args: Array[String]): Unit = {
-    val query = users.result
-    val action = db.run(query)
-
-    val result = Await.result(action, Duration.Inf)
-    result.foreach(println)
-  }
-}
 
 
 ```
+
+**Ejemplo Consultas Slick**
+
+```scala
+import slick.jdbc.MySQLProfile.api._
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+import scala.concurrent.Await
+import scala.concurrent.duration._
+
+object Exploracion2 {
+
+  // Configuración del DB y conexión a la base de datos
+  val db = Database.forURL(
+    "jdbc:mysql://localhost:3306/music_library", // URL de la base de datos
+    driver = "com.mysql.cj.jdbc.Driver",
+    user = "root", // Usuario
+    password = "Dacampoverde11", // Contraseña
+    keepAliveConnection = true
+  )
+
+  // Definición del modelo `Song`
+  case class Song(id: Int, title: String, artist: String, album: String, duration: String)
+
+  // Definir la tabla `songs`
+  class Songs(tag: Tag) extends Table[Song](tag, "songs") {
+    def id = column[Int]("id", O.PrimaryKey)
+    def title = column[String]("title")
+    def artist = column[String]("artist")
+    def album = column[String]("album")
+    def duration = column[String]("duration")
+
+    def * = (id, title, artist, album, duration) <> (Song.tupled, Song.unapply)
+  }
+
+  // Crear la instancia de la tabla
+  val songs = TableQuery[Songs]
+
+  // Función para obtener todas las canciones
+  def getAllSongs: Future[List[Song]] = {
+    val query = songs.result
+    db.run(query).map(_.toList)
+  }
+
+  // Función para obtener canciones con duración mayor a 5 minutos
+  def getSongsLongerThanFiveMinutes: Future[List[Song]] = {
+    val query = songs.filter(_.duration > "00:05:00").result
+    db.run(query).map(_.toList)
+  }
+
+  // Método principal
+  def main(args: Array[String]): Unit = {
+    val allSongsFuture = getAllSongs
+    val longSongsFuture = getSongsLongerThanFiveMinutes
+
+    // Esperar que ambas consultas se completen
+    val allSongs = Await.result(allSongsFuture, 10.seconds)
+    val longSongs = Await.result(longSongsFuture, 10.seconds)
+
+    // Mostrar todas las canciones
+    println("Todas las canciones:")
+    println(f"${"ID"}%-5s ${"Título"}%-40s ${"Artista"}%-30s ${"Álbum"}%-30s ${"Duración"}")
+    println("-" * 110)
+    allSongs.foreach { song =>
+      println(f"${song.id}%-5d ${song.title}%-40s ${song.artist}%-30s ${song.album}%-30s ${song.duration}")
+    }
+    println()
+
+    // Mostrar canciones con duración mayor a 5 minutos
+    println("Canciones con duración mayor a 5 minutos:")
+    println(f"${"ID"}%-5s ${"Título"}%-40s ${"Artista"}%-30s ${"Álbum"}%-30s ${"Duración"}")
+    println("-" * 110)
+    longSongs.foreach { song =>
+      println(f"${song.id}%-5d ${song.title}%-40s ${song.artist}%-30s ${song.album}%-30s ${song.duration}")
+    }
+
+    // Cerrar la conexión
+    db.close()
+  }
+}
+```
+![image](https://github.com/user-attachments/assets/ca23b586-b3a0-4782-88cd-1da916b6df38)
+![image](https://github.com/user-attachments/assets/a43b6409-9d05-4cdd-916a-fc1daa6a4efb)
+
+
