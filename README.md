@@ -127,4 +127,82 @@ INSERT INTO songs (title, artist, album, duration) VALUES
 ('Si No Te Tengo a Ti (En Vivo)', 'Hombres G', 'Huevos Revueltos', '00:05:27'),
 ('Hey Jude - Remastered 2015', 'The Beatles', '1 (Remastered)', '00:07:06');
 ```
+![image](https://github.com/user-attachments/assets/47986f2c-f87a-46ad-ad61-eb3858358d91)
 
+### 2. Configurar la conexión a MySQL desde Scala
+
+Agregue las siguientes dependencias en su archivo build.sbt:
+
+```scala
+libraryDependencies ++= Seq(
+  "mysql" % "mysql-connector-java" % "8.0.33", // Driver MySQL
+  "org.tpolecat" %% "doobie-core" % "1.0.0-RC2", // Para Doobie
+  "com.typesafe.slick" %% "slick" % "3.4.1" // Para Slick
+)
+
+```
+#### **Establecer conexión con Doobie**
+```scala
+import cats.effect.IO
+import doobie._
+import doobie.implicits._
+
+object MySQLConnection {
+  val xa = Transactor.fromDriverManager[IO](
+    "com.mysql.cj.jdbc.Driver",   // Driver MySQL
+    "jdbc:mysql://localhost:3306/scala_db", // URL de la base de datos
+    "root",                       // Usuario
+    "password"                    // Contraseña
+  )
+
+  def getAllUsers: IO[List[(Int, String, String)]] = {
+    sql"SELECT id, name, email FROM users"
+      .query[(Int, String, String)]
+      .to[List]
+      .transact(xa)
+  }
+
+  def main(args: Array[String]): Unit = {
+    val users = getAllUsers.unsafeRunSync()
+    users.foreach(println)
+  }
+}
+
+```
+
+#### **Establecer conexión con Slick**
+
+```scala
+import slick.jdbc.MySQLProfile.api._
+
+import scala.concurrent.Await
+import scala.concurrent.duration.Duration
+
+object SlickExample {
+  val db = Database.forURL(
+    "jdbc:mysql://localhost:3306/scala_db",
+    user = "root",
+    password = "password",
+    driver = "com.mysql.cj.jdbc.Driver"
+  )
+
+  class Users(tag: Tag) extends Table[(Int, String, String)](tag, "users") {
+    def id = column[Int]("id", O.PrimaryKey, O.AutoInc)
+    def name = column[String]("name")
+    def email = column[String]("email")
+    def * = (id, name, email)
+  }
+
+  val users = TableQuery[Users]
+
+  def main(args: Array[String]): Unit = {
+    val query = users.result
+    val action = db.run(query)
+
+    val result = Await.result(action, Duration.Inf)
+    result.foreach(println)
+  }
+}
+
+
+```
