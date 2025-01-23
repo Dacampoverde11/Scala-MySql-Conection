@@ -389,7 +389,49 @@ object Exploracion2 {
   }
 }
 ```
+
+
+
 ![image](https://github.com/user-attachments/assets/ca23b586-b3a0-4782-88cd-1da916b6df38)
 ![image](https://github.com/user-attachments/assets/a43b6409-9d05-4cdd-916a-fc1daa6a4efb)
+
+#### Resumen del Código en Scala
+
+Este código utiliza **Slick** para interactuar con una base de datos MySQL y realizar consultas sobre una tabla llamada `songs`. A continuación, se detalla su funcionamiento:
+
+#### Configuración del DB y conexión a la base de datos
+
+- Se configura el objeto `db` utilizando `Database.forURL`, que conecta a la base de datos MySQL ubicada en `localhost:3306/music_library`.
+- Se especifica:
+  - La URL de la base de datos.
+  - El controlador JDBC.
+  - El usuario.
+  - La contraseña.
+  - `keepAliveConnection` se mantiene la conexión abierta mientras se realiza la operación.
+
+#### Definición del modelo `Song`
+
+- Se define el case class `Song` que representa la estructura de la tabla `songs` con las columnas: `id`, `title`, `artist`, `album`, `duration`.
+
+#### Definición de la tabla `songs`
+
+- Se crea la clase `Songs`, que extiende `Table[Song]` y representa la tabla `songs` en la base de datos.
+- Se definen las columnas:
+  - `id` (PrimaryKey)
+  - `title`
+  - `artist`
+  - `album`
+  - `duration`
+- La función `*` define cómo mapear los resultados de la base de datos a objetos de tipo `Song` utilizando el patrón `tupled` y `unapply`.
+
+---
+
+### Referencias bibliográficas
+
+1. Oracle. (2023). *Java Database Connectivity (JDBC) Overview*. Recuperado de [https://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/](https://docs.oracle.com/javase/8/docs/technotes/guides/jdbc/).
+2. Slick Team. (2023). *Slick: Functional Relational Mapping for Scala*. Recuperado de [https://scala-slick.org/](https://scala-slick.org/).
+3. Doobie Documentation. (2023). *Doobie Functional JDBC for Scala*. Recuperado de [https://tpolecat.github.io/doobie/](https://tpolecat.github.io/doobie/).
+4. Lightbend. (2023). *Building database applications in Scala*. Recuperado de [https://www.lightbend.com/](https://www.lightbend.com/).
+
 
 
