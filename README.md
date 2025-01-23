@@ -28,9 +28,9 @@ JDBC (Java Database Connectivity) es una API estándar proporcionada por Java qu
 
 Scala cuenta con varias librerías diseñadas para conectarse y trabajar con bases de datos relacionales. Entre las más populares están Slick y Doobie, que abordan la interacción con las bases de datos desde diferentes paradigmas y niveles de abstracción.
 
-### **Principales librerías**
+**Principales librerías**
 
-#### Slick
+### Slick
 Slick es un ORM (Object-Relational Mapping) funcional que proporciona una API altamente tipada para realizar consultas SQL de manera declarativa y funcional.
 
 **Ventajas:**
@@ -40,7 +40,9 @@ Compatible con varias bases de datos populares, como PostgreSQL, MySQL y SQLite.
 
 **Desventajas:**
 Tiene una curva de aprendizaje moderada, especialmente para desarrolladores nuevos en Scala o programación funcional.
-Doobie
+
+### Doobie
+
 Doobie es una biblioteca funcional construida sobre Cats, que permite trabajar directamente con JDBC, proporcionando un control más explícito sobre las consultas SQL.
 
 **Ventajas:**
@@ -52,5 +54,26 @@ Al ser más explícito y técnico, requiere conocimientos sólidos de programaci
 
 ### Comparación entre Slick y Doobie
 
+| Aspecto             | Slick                                           | Doobie                                                 |
+|---------------------|------------------------------------------------|-------------------------------------------------------|
+| **Paradigma**       | Abstracción funcional para consultas SQL.       | Trabajo directo con JDBC desde un enfoque funcional.  |
+| **Nivel de abstracción** | Alto (similar a un ORM).                       | Medio (gestión manual de consultas SQL).              |
+| **Curva de aprendizaje** | Moderada, ideal para quienes tienen experiencia con Java y ORM. | Más pronunciada, adecuada para desarrolladores con experiencia en programación funcional. |
+| **Soporte funcional** | Opcional.                                     | Obligatorio, basado en Cats.                          |
+
+
+## Información adicional sobre JDBC y herramientas en Scala
+### Integración con otras herramientas:
+
+JDBC se puede combinar con frameworks como Spring para manejar transacciones, inyecciones de dependencias y configuraciones avanzadas.
+
+### Aspectos de rendimiento:
+
+Usar PreparedStatement no solo mejora la seguridad al evitar inyección SQL, sino que también optimiza el rendimiento al permitir la reutilización de consultas precompiladas.
+
+### Otros frameworks de bases de datos en Scala:
+
+Quill: Una biblioteca funcional que facilita la generación de consultas SQL basadas en modelos tipados, similar a Slick pero con un enfoque más declarativo.
+JDBC Direct: Permite trabajar directamente con JDBC sin abstracciones adicionales, adecuado para proyectos pequeños.
 
 
