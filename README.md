@@ -228,6 +228,48 @@ object Exploracion1 extends IOApp.Simple {
 
 ![image](https://github.com/user-attachments/assets/b1bbc200-8316-4879-a5f5-12d561f93c6f)
 
+#### Resumen del Código en Scala
+
+Este código utiliza **Cats Effect** y **Doobie** para interactuar con una base de datos MySQL y realizar consultas sobre una tabla llamada `songs`. A continuación, se detalla su funcionamiento:
+
+##### Configuración del transactor
+
+- En el objeto `MySQLConnection`, se configura un transactor (`xa`) que se utiliza para conectar y ejecutar consultas en la base de datos MySQL.
+- Se especifican:
+  - El controlador JDBC.
+  - La URL de la base de datos.
+  - El usuario.
+  - La contraseña.
+
+##### Consulta para obtener todas las canciones
+
+- La función `getAllSongs`:
+  - Ejecuta una consulta SQL que selecciona todas las columnas (`id`, `title`, `artist`, `album`, `duration`) de la tabla `songs`.
+  - Convierte el resultado en una lista de tuplas de tipo `(Int, String, String, String, String)` (correspondientes a las columnas seleccionadas).
+  - Ejecuta la consulta en la base de datos usando el transactor.
+
+##### Consulta para canciones con duración mayor a 5 minutos
+
+- La función `getSongsLongerThanFiveMinutes`:
+  - Ejecuta una consulta SQL similar, pero filtra las canciones con una duración mayor a 5 minutos (`duration > '00:05:00'`).
+  - Convierte el resultado en una lista de tuplas.
+
+##### Método principal (`run`)
+
+- Define la secuencia de acciones que realiza el programa:
+  1. Obtiene la lista de todas las canciones llamando a `getAllSongs` y las imprime en formato tabular.
+  2. Obtiene las canciones con duración mayor a 5 minutos llamando a `getSongsLongerThanFiveMinutes` y también las imprime en formato tabular.
+- Estas acciones están encapsuladas en el efecto `IO` proporcionado por Cats Effect.
+
+##### Salida en consola
+
+- Los resultados de ambas consultas se imprimen en un formato tabular.
+- Las columnas están alineadas para facilitar la lectura.
+
+---
+
+
+
 
 
 #### **Establecer conexión con Slick**
