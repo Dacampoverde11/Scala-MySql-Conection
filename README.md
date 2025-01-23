@@ -24,6 +24,9 @@ JDBC (Java Database Connectivity) es una API estándar proporcionada por Java qu
    #### **SQLException**
    Es la clase utilizada para manejar errores y excepciones que pueden ocurrir durante la interacción con la base de datos, como problemas de conexión, consultas mal formadas o restricciones violadas.
 
+
+   
+
 ## Librerías en Scala para interactuar con bases de datos relacionales
 
 Scala cuenta con varias librerías diseñadas para conectarse y trabajar con bases de datos relacionales. Entre las más populares están Slick y Doobie, que abordan la interacción con las bases de datos desde diferentes paradigmas y niveles de abstracción.
@@ -62,6 +65,10 @@ Al ser más explícito y técnico, requiere conocimientos sólidos de programaci
 | **Soporte funcional** | Opcional.                                     | Obligatorio, basado en Cats.                          |
 
 
+
+
+
+
 ## Información adicional sobre JDBC y herramientas en Scala
 ### Integración con otras herramientas:
 
@@ -76,4 +83,48 @@ Usar PreparedStatement no solo mejora la seguridad al evitar inyección SQL, sin
 Quill: Una biblioteca funcional que facilita la generación de consultas SQL basadas en modelos tipados, similar a Slick pero con un enfoque más declarativo.
 JDBC Direct: Permite trabajar directamente con JDBC sin abstracciones adicionales, adecuado para proyectos pequeños.
 
+
+## Establecer Conexion con una Base de Datos en Scala
+
+## 1. Crear una base de datos en MySQL
+
+Ejecute el siguiente script SQL en su entorno MySQL:
+
+```sql
+CREATE DATABASE music_library;
+
+USE music_library;
+
+CREATE TABLE songs (
+    id INT AUTO_INCREMENT PRIMARY KEY,          -- Identificador único
+    title VARCHAR(255) NOT NULL,                -- Título de la canción
+    artist VARCHAR(255) NOT NULL,               -- Artista
+    album VARCHAR(255) NOT NULL,                -- Álbum
+    duration TIME NOT NULL                      -- Duración de la canción (hh:mm:ss)
+);
+
+-- Insertar datos de las canciones
+INSERT INTO songs (title, artist, album, duration) VALUES
+('Tanto Ganas Tanto Pierdes', 'Verde 70', 'La Edad de la Zebra', '00:04:13'),
+('You Shook Me All Night Long', 'AC/DC', 'Who Made Who', '00:03:31'),
+('De Música Ligera - Remasterizado', 'Soda Stereo', 'Canción Animal', '00:03:33'),
+('La chispa adecuada', 'Héroes del Silencio', 'Avalancha', '00:05:27'),
+('La chispa adecuada - Live', 'Héroes del Silencio', 'Tour 2007', '00:05:25'),
+('Billie Jean', 'Michael Jackson', 'Thriller 25 Super Deluxe Edition', '00:04:54'),
+('Creep', 'Radiohead', 'Pablo Honey', '00:03:59'),
+('Your Love', 'The Outfield', 'Play Deep', '00:03:36'),
+('Chico tienes que cuidarte', 'Hombres G', '30 años y un día', '00:04:10'),
+('Nothing\'s Gonna Stop Us Now', 'Starship', 'No Protection', '00:04:30'),
+('Soñé', 'Zoé', 'MTV Unplugged', '00:03:47'),
+('Knockin\' On Heaven\'s Door', 'Guns N\' Roses', 'Use Your Illusion II', '00:05:36'),
+('Sweet Child O\' Mine', 'Guns N\' Roses', 'Appetite For Destruction', '00:05:55'),
+('I Was Made For Lovin\' You', 'KISS', 'Dynasty', '00:04:31'),
+('Marta Tiene un Marcapasos', 'Hombres G, Los Enanitos Verdes', 'Huevos Revueltos', '00:04:11'),
+('More Than Words', 'Extreme', 'Extreme II - Pornograffitti', '00:05:34'),
+('The Way You Make Me Feel - 2012 Remaster', 'Michael Jackson', 'Bad 25th Anniversary', '00:04:58'),
+('Oye Mi Amor', 'Maná', '¿Dónde Jugarán los Niños?', '00:04:23'),
+('Bohemian Rhapsody - Remasterizado', 'Queen', 'A Night At The Opera', '00:05:54'),
+('Si No Te Tengo a Ti (En Vivo)', 'Hombres G', 'Huevos Revueltos', '00:05:27'),
+('Hey Jude - Remastered 2015', 'The Beatles', '1 (Remastered)', '00:07:06');
+```
 
